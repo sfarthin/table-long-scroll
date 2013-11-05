@@ -1,0 +1,89 @@
+<html>
+
+<head>
+	<title>Long Scroll</title>
+	
+	<style>
+	
+	.state { width:20%; }
+	.gender { width:20%; }
+	.year { width:20%; }
+	.name { width:20%; }
+	.num { width:20%; }
+	
+	#long-scroll1 {
+		border: 1px solid black;
+	}
+	
+	.long-scroll .viewport {
+		overflow: auto;
+		height: 400px;
+	}
+	
+	.long-scroll .thead, .long-scroll .tbody .row {
+		display: -ms-flexbox;
+		-ms-box-orient: horizontal;
+
+		display: -webkit-flex;
+		display: -moz-flex;
+		display: -ms-flex;
+		display: flex;
+
+		-webkit-flex-flow: row wrap;
+		-moz-flex-flow: row wrap;
+		-ms-flex-flow: row wrap;
+		flex-flow: row wrap;
+	} 
+	
+	</style>
+</head>
+<body>
+	<h1>Long Scoll</h1>
+
+	<p>This is a simple version Adaptive virtual scrolling (handle hundreds of thousands of rows with extreme responsiveness)</p>
+
+	<div class="long-scroll" id="long-scroll1"></div>
+	
+	<script src="long-scroll.js"></script>
+	<script>
+		// Lets pull XHR dataset
+		var pullDataSet = function(callback) {
+			req = new XMLHttpRequest();
+			req.onreadystatechange = function() {
+				if (req.readyState == 4 && (req.status == 200 || req.status == 304)) {
+					callback(req.responseText.split("\n").map(function(row) {
+						var arr = row.split(",");
+						
+						return {
+							state: 	arr[0],
+							gender: arr[1],
+							year: 	arr[2],
+							name: 	arr[3],
+							num: 	arr[4]
+						}
+					}));
+				}
+			};
+	
+			req.open('GET', 'CT.TXT');
+			req.send(null);
+		};
+		
+		
+		// Set up the Long Scroll Table.
+		pullDataSet(function(data) {
+			new LongScroll({
+				el: document.getElementById("long-scroll1"),
+				data: data,
+				columns: {
+					state: 	"State",
+					gender: "Gender",
+					year: 	"Year",
+					name: 	"Name",
+					num: 	"Number of children"
+				}
+			});
+		});
+
+	</script>
+</body>
