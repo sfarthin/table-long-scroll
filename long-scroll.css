@@ -1,0 +1,19 @@
+.long-scroll .table-scroll-viewport {
+	overflow: auto;
+	height: 400px;
+}
+
+.long-scroll .table-scroll-thead, .long-scroll .table-scroll-tbody .table-scroll-row {
+	display: -ms-flexbox;
+	-ms-box-orient: horizontal;
+
+	display: -webkit-flex;
+	display: -moz-flex;
+	display: -ms-flex;
+	display: flex;
+
+	-webkit-flex-flow: row wrap;
+	-moz-flex-flow: row wrap;
+	-ms-flex-flow: row wrap;
+	flex-flow: row wrap;
+} 

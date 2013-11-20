@@ -39,13 +39,16 @@ var LongScroll = function LongScroll(opts) {
 	
 		// Lets build our table for the header
 		var html = [], j = 0;
-		html[j++] = "<div class='thead'>";
-		for(var i in opts.columns) html[j++] = "<div class='"+i+"'>"+opts.columns[i]+"</div>"
-		html[j++] = "</div>";
-		html[j++] = "<div class='viewport'></div>";
+		
+		if(opts.columns) {
+			html[j++] = "<div class='table-scroll-thead'>";
+			for(var i in opts.columns) html[j++] = "<div class='"+i+"'>"+opts.columns[i]+"</div>"
+			html[j++] = "</div>";
+		}
+		html[j++] = "<div class='table-scroll-viewport'></div>";
 		el.innerHTML = html.join("");
 
-		viewport = el.children[1];
+		viewport = el.querySelector(".table-scroll-viewport");
 		viewport.addEventListener('scroll', scrollEventListener, false);
 	
 		self.render();	
@@ -60,27 +63,30 @@ var LongScroll = function LongScroll(opts) {
 		
 		var scrollTop = viewport.scrollTop;
 		
-		if(!viewport.innerHTML) viewport.innerHTML = "<div class='tbody'><div class='row'>-</div></div>";
+		if(!viewport.innerHTML) viewport.innerHTML = "<div class='table-scroll-tbody'><div class='row'>-</div></div>";
 	
 		var html = [],  j = 0,
 			excessPages = 10,
-			rowHeight = (opts.rowHeight || viewport.children[0].children[0].offsetHeight),
+			rowHeight = (opts.rowHeight || (viewport.children[0].children[0] && viewport.children[0].children[0].offsetHeight) || self.rowHeight),
 			visibleRows = Math.ceil(viewport.offsetHeight/rowHeight),
 			tableHeight = visibleRows * rowHeight,
 			visibleStartIndex = Math.floor(scrollTop/rowHeight),
 			rowsStartIndex = (visibleStartIndex - (visibleRows * excessPages/2) > 0 ? visibleStartIndex - (visibleRows * excessPages/2) : 0),
 			paddingTop = rowsStartIndex * rowHeight + (Math.floor(scrollTop/rowHeight) - (scrollTop/rowHeight)),
-			paddingBottom = (rowsStartIndex + (visibleRows * excessPages) < opts.data.length ? (opts.data.length - (rowsStartIndex + (visibleRows * excessPages)))*rowHeight : 0 );
+			paddingBottom = (rowsStartIndex + (visibleRows * excessPages) < data.length ? (data.length - (rowsStartIndex + (visibleRows * excessPages)))*rowHeight : 0 );
 	
 		//console.log(rowsStartIndex, visibleStartIndex);
+		self.rowHeight = rowHeight;
 	
-		opts.data.slice(rowsStartIndex,rowsStartIndex+(visibleRows*excessPages)).forEach(function(item) {
+		data.slice(rowsStartIndex,rowsStartIndex+(visibleRows*excessPages)).forEach(function(item) {
 			
-			html[j++] = "<div class='row'>";
-			for(var i in opts.columns) {
-				html[j++] = "<div class='"+i+"'>"+item[i]+"</div>";
+			if(opts.renderRow) {
+				html[j++] = opts.renderRow(item);
+			} else {
+				for(var i in opts.columns) {
+					html[j++] = "<div class='"+i+" table-scroll-row'>"+item[i]+"</div>";
+				}
 			}
-			html[j++] = "</div>";
 		
 		});
 		
@@ -90,6 +96,9 @@ var LongScroll = function LongScroll(opts) {
 		viewport.children[0].style.paddingBottom = paddingBottom+"px";
 
 		self.scrollLimits = [rowsStartIndex*rowHeight, (rowsStartIndex+(visibleRows*excessPages))*rowHeight];
+		
+		if(opts.onRender)
+			opts.onRender();
 	
 	};
 		
