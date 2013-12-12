@@ -78,17 +78,26 @@ var LongScroll = function LongScroll(opts) {
 		//console.log(rowsStartIndex, visibleStartIndex);
 		self.rowHeight = rowHeight;
 	
-		data.slice(rowsStartIndex,rowsStartIndex+(visibleRows*excessPages)).forEach(function(item) {
+		if(data.length) {
+	
+			data.slice(rowsStartIndex,rowsStartIndex+(visibleRows*excessPages)).forEach(function(item) {
 			
-			if(opts.renderRow) {
-				html[j++] = opts.renderRow(item);
-			} else {
-				for(var i in opts.columns) {
-					html[j++] = "<div class='"+i+" table-scroll-row'>"+item[i]+"</div>";
+				if(opts.renderRow) {
+					html[j++] = opts.renderRow(item);
+				} else {
+					for(var i in opts.columns) {
+						html[j++] = "<div class='"+i+" table-scroll-row'>"+item[i]+"</div>";
+					}
 				}
-			}
 		
-		});
+			});
+		
+		} else {
+			
+			if(opts.emptyMessage)
+				html[j++] = opts.emptyMessage;
+			
+		}
 		
 		viewport.children[0].innerHTML = html.join("");
 		
